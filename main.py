@@ -43,3 +43,6 @@ if __name__ == "__main__":
 
         elif cmd[0] == "show":
             show(processes)
+        
+        else:
+            print("No such command:", cmd[0])

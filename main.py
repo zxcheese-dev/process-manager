@@ -1,17 +1,21 @@
 import psutil
 
+process_dict = {}
+
 def script():
     listing_processes = []
-    processes = set()
 
     for proc in psutil.process_iter(["pid", "name"]):
         try:
             name = proc.name()
             pid = proc.pid
 
-            if name not in processes:
-                processes.add(name)
-                listing_processes.append(f"{name} | {pid}")
+            listing_processes.append(f"{name} | {pid}")
+
+            if name not in process_dict:
+                process_dict[name] = []
+            process_dict[name].append(pid)
+
         except(psutil.NoSuchProcess, psutil.AccessDenied):
             continue
     
@@ -39,7 +43,11 @@ if __name__ == "__main__":
         cmd = input("\nCommand: ").split(" ")
 
         if cmd[0] == "stop":
-            kill(int(cmd[1]))
+            try:
+                kill(int(cmd[1]))
+            except (ValueError):
+                for task in process_dict[cmd[1]]:
+                    kill(task)
 
         elif cmd[0] == "show":
             show(processes)
